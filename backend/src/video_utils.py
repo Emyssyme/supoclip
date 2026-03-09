@@ -91,13 +91,17 @@ def get_video_transcript(video_path: Path, speech_model: str = "best") -> str:
     # Request word-level timestamps for precise subtitle sync
     speech_model_value = aai.SpeechModel.best
     if speech_model == "nano":
-        speech_model_value = aai.SpeechModel.nano
+        # Use universal-2 as the efficient/faster model
+        selected_models = ["universal-2"]
+    else:
+        # Use universal-3-pro for the best quality, with universal-2 as fallback
+        selected_models = ["universal-3-pro", "universal-2"]
 
     config_obj = aai.TranscriptionConfig(
         speaker_labels=False,
         punctuate=True,
         format_text=True,
-        speech_model=speech_model_value,
+        speech_models=selected_models  # Use the list of allowed strings
     )
 
     try:
@@ -1188,8 +1192,6 @@ def create_optimized_clip(
             )
             target_width, target_height = round_to_even(new_width), round_to_even(new_height)
             processed_clip = cropped_clip
->>>>>>> 70946ce (Subtitle speed up)
-
         # Add AssemblyAI subtitles with template support
         final_clips = [processed_clip]
 
